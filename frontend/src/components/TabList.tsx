@@ -11,14 +11,16 @@ export const TabList = (props: TabListProps) => {
   return (
     <Box sx={{ display: "flex", gap: 1 }}>
       <Chip
+        color={viewCompleted ? "primary" : "default"}
         label="Completed"
-        variant={viewCompleted ? "filled" : "outlined"}
         onClick={() => onToggle(true)}
+        variant={viewCompleted ? "filled" : "outlined"}
       />
       <Chip
+        color={viewCompleted ? "default" : "primary"}
         label="Incomplete"
-        variant={viewCompleted ? "outlined" : "filled"}
         onClick={() => onToggle(false)}
+        variant={viewCompleted ? "outlined" : "filled"}
       />
     </Box>
   );

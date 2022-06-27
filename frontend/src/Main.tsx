@@ -1,47 +1,34 @@
 import { Add } from "@mui/icons-material";
 import { Box, Button, Paper, Stack, Typography } from "@mui/material";
-import { useState } from "react";
+import axios from "axios";
+import { useEffect, useState } from "react";
 import { ItemDialog } from "./components/ItemDialog";
 import { ItemList } from "./components/ItemList";
 import { TabList } from "./components/TabList";
 import { TodoItem } from "./types";
 
-const todoItems: TodoItem[] = [
-  {
-    id: 1,
-    title: "Go to Market",
-    description: "Buy ingredients to prepare dinner",
-    completed: true,
-  },
-  {
-    id: 2,
-    title: "Study",
-    description: "Read Algebra and History textbook for the upcoming test",
-    completed: false,
-  },
-  {
-    id: 3,
-    title: "Sammy's books",
-    description: "Go to library to return Sammy's books",
-    completed: true,
-  },
-  {
-    id: 4,
-    title: "Article",
-    description: "Write article on how to use Django with React",
-    completed: false,
-  },
-];
-
 export const Main = () => {
   const [viewCompleted, setViewCompleted] = useState(false);
-  const [showAddItem, setShowAddItem] = useState(false);
+  const [showItemDialog, setShowItemDialog] = useState(false);
   const [activeItem, setActiveItem] = useState<TodoItem>({
     title: "",
     description: "",
     completed: false,
   });
-  const [todoList, setTodoList] = useState<TodoItem[]>(todoItems);
+  const [todoList, setTodoList] = useState<TodoItem[]>([]);
+
+  useEffect(() => {
+    refreshList();
+  }, []);
+
+  const refreshList = async () => {
+    try {
+      const res = await axios.get("/api/todos/");
+      setTodoList(res.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const toggleTab = (displayCompleted: boolean) => {
     setViewCompleted(displayCompleted);
@@ -49,20 +36,27 @@ export const Main = () => {
 
   const createItem = () => {
     setActiveItem({ title: "", description: "", completed: false });
-    setShowAddItem(true);
+    setShowItemDialog(true);
   };
 
   const editItem = (item: TodoItem) => {
     setActiveItem(item);
-    setShowAddItem(true);
+    setShowItemDialog(true);
   };
 
-  const saveItem = (item: TodoItem) => {
-    alert("save" + JSON.stringify(item));
+  const saveItem = async (item: TodoItem) => {
+    if (item.id) {
+      await axios.put(`/api/todos/${item.id}/`, item);
+    } else {
+      await axios.post("/api/todos/", item);
+    }
+    setShowItemDialog(false);
+    refreshList();
   };
 
-  const deleteItem = (item: TodoItem) => {
-    alert("delete" + JSON.stringify(item));
+  const deleteItem = async (item: TodoItem) => {
+    await axios.delete(`/api/todos/${item.id}/`);
+    refreshList();
   };
 
   return (
@@ -89,10 +83,10 @@ export const Main = () => {
           onDelete={deleteItem}
         />
       </Paper>
-      {showAddItem ? (
+      {showItemDialog ? (
         <ItemDialog
           activeItem={activeItem}
-          onClose={() => setShowAddItem(false)}
+          onClose={() => setShowItemDialog(false)}
           onSave={saveItem}
         />
       ) : null}

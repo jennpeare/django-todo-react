@@ -1,4 +1,4 @@
-import { DeleteOutlined, EditOutlined } from "@mui/icons-material";
+import { Delete, Edit } from "@mui/icons-material";
 import {
   Box,
   Divider,
@@ -27,7 +27,7 @@ export const ItemList = (props: ItemListProps) => {
             secondaryAction={
               <>
                 <IconButton onClick={() => onEdit(item)}>
-                  <EditOutlined />
+                  <Edit />
                 </IconButton>
                 <IconButton
                   edge="end"
@@ -35,7 +35,7 @@ export const ItemList = (props: ItemListProps) => {
                   sx={{ ml: 2 }}
                   onClick={() => onDelete(item)}
                 >
-                  <DeleteOutlined />
+                  <Delete />
                 </IconButton>
               </>
             }
