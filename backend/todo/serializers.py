@@ -7,4 +7,4 @@ class TodoSerializer(serializers.ModelSerializer):
     # the thing you'll actually have access to
     class Meta:
         model = Todo
-        fields = ("id", "title", "description", "completed")
+        fields = ("id", "title", "description", "completed", "priority", "due_date")
