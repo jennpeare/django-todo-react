@@ -7,14 +7,18 @@ import { ItemList } from "./components/ItemList";
 import { TabList } from "./components/TabList";
 import { TodoItem } from "./types";
 
+const getNewItem = (): TodoItem => ({
+  title: "",
+  description: "",
+  completed: false,
+  priority: 0,
+  due_date: null,
+});
+
 export const Main = () => {
   const [viewCompleted, setViewCompleted] = useState(false);
   const [showItemDialog, setShowItemDialog] = useState(false);
-  const [activeItem, setActiveItem] = useState<TodoItem>({
-    title: "",
-    description: "",
-    completed: false,
-  });
+  const [activeItem, setActiveItem] = useState<TodoItem>(getNewItem());
   const [todoList, setTodoList] = useState<TodoItem[]>([]);
 
   useEffect(() => {
@@ -35,7 +39,7 @@ export const Main = () => {
   };
 
   const createItem = () => {
-    setActiveItem({ title: "", description: "", completed: false });
+    setActiveItem(getNewItem());
     setShowItemDialog(true);
   };
 

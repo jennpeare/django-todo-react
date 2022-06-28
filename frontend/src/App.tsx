@@ -4,6 +4,8 @@ import {
   CssBaseline,
   ThemeProvider,
 } from "@mui/material";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { Main } from "./Main";
 
 const theme = createTheme({
@@ -16,9 +18,11 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Container fixed>
-        <Main />
-      </Container>
+      <LocalizationProvider dateAdapter={AdapterDateFns}>
+        <Container fixed>
+          <Main />
+        </Container>
+      </LocalizationProvider>
     </ThemeProvider>
   );
 }

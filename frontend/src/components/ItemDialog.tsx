@@ -1,14 +1,22 @@
 import {
+  Box,
   Button,
   Checkbox,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
+  FormControl,
   FormControlLabel,
   FormGroup,
+  InputLabel,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
   TextField,
 } from "@mui/material";
+import { DatePicker } from "@mui/x-date-pickers";
+import { format, parseISO } from "date-fns";
 import { useState } from "react";
 import { TodoItem } from "../types";
 
@@ -32,6 +40,17 @@ export const ItemDialog = (props: ItemDialogProps) => {
     }
   };
 
+  const handlePriorityChange = (e: SelectChangeEvent<Number>) => {
+    setActiveItem((prev) => ({ ...prev, priority: e.target.value as number }));
+  };
+
+  const handleDateChange = (newDate: Date | null) => {
+    setActiveItem((prev) => ({
+      ...prev,
+      due_date: newDate ? format(newDate, "yyyy-MM-dd") : null,
+    }));
+  };
+
   return (
     <Dialog open={true} onClose={onClose} fullWidth>
       <DialogTitle>Todo Item</DialogTitle>
@@ -43,8 +62,10 @@ export const ItemDialog = (props: ItemDialogProps) => {
           name="title"
           onChange={handleChange}
           placeholder="Enter Todo Title"
+          required
           value={activeItem.title}
         />
+
         <TextField
           fullWidth
           label="Description"
@@ -53,9 +74,35 @@ export const ItemDialog = (props: ItemDialogProps) => {
           name="description"
           onChange={handleChange}
           placeholder="Enter Todo description"
+          required
           rows={2}
           value={activeItem.description}
         />
+
+        <Box sx={{ display: "flex", gap: 2 }}>
+          <FormControl fullWidth margin="dense" required>
+            <InputLabel>Priority</InputLabel>
+            <Select
+              label="Priority"
+              onChange={handlePriorityChange}
+              value={activeItem.priority}
+            >
+              <MenuItem value={0}>Low</MenuItem>
+              <MenuItem value={1}>Medium</MenuItem>
+              <MenuItem value={2}>High</MenuItem>
+            </Select>
+          </FormControl>
+
+          <FormControl fullWidth margin="dense">
+            <DatePicker
+              label="Due Date"
+              onChange={handleDateChange}
+              renderInput={(params) => <TextField {...params} />}
+              value={activeItem.due_date ? parseISO(activeItem.due_date) : null}
+            />
+          </FormControl>
+        </Box>
+
         <FormGroup>
           <FormControlLabel
             control={

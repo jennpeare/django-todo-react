@@ -1,13 +1,16 @@
-import { Delete, Edit } from "@mui/icons-material";
+import { Delete, Edit, Schedule } from "@mui/icons-material";
 import {
   Box,
+  Chip,
   Divider,
   IconButton,
   List,
   ListItem,
+  ListItemIcon,
   ListItemText,
 } from "@mui/material";
 import { TodoItem } from "../types";
+import { PriorityIcon } from "./PriorityIcon";
 
 interface ItemListProps {
   onDelete: (item: TodoItem) => void;
@@ -23,9 +26,16 @@ export const ItemList = (props: ItemListProps) => {
       {items.map((item, index) => (
         <Box key={item.id}>
           <ListItem
-            alignItems="flex-start"
             secondaryAction={
               <>
+                {item.due_date ? (
+                  <Chip
+                    icon={<Schedule />}
+                    label={item.due_date}
+                    size="small"
+                    sx={{ mr: 3 }}
+                  />
+                ) : null}
                 <IconButton onClick={() => onEdit(item)}>
                   <Edit />
                 </IconButton>
@@ -40,6 +50,9 @@ export const ItemList = (props: ItemListProps) => {
               </>
             }
           >
+            <ListItemIcon>
+              <PriorityIcon priority={item.priority} />
+            </ListItemIcon>
             <ListItemText primary={item.title} secondary={item.description} />
           </ListItem>
           {index !== items.length - 1 ? <Divider component="li" /> : null}
