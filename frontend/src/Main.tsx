@@ -5,8 +5,8 @@ import { useEffect, useState } from "react";
 import { ItemDialog } from "./components/ItemDialog";
 import { ItemList } from "./components/ItemList";
 import { SearchBar } from "./components/SearchBar";
-import { TabList } from "./components/TabList";
-import { TodoItem } from "./types";
+import { Tabs } from "./components/Tabs";
+import { Sorter, TodoItem } from "./types";
 
 const getNewItem = (): TodoItem => ({
   title: "",
@@ -69,6 +69,18 @@ export const Main = () => {
     setTodoList(res.data);
   };
 
+  const handleSort = async (sorters: Sorter[]) => {
+    const query = sorters
+      .map((sorter) => {
+        if (sorter.state === "off") return "";
+        return `${sorter.state === "desc" ? "-" : ""}${sorter.type}`;
+      })
+      .filter((q) => q !== "")
+      .join(",");
+    const res = await axios.get(`/api/todos/?ordering=${query}`);
+    setTodoList(res.data);
+  };
+
   return (
     <Stack sx={{ alignItems: "center" }}>
       <Typography variant="h4" sx={{ my: 2 }}>
@@ -80,9 +92,10 @@ export const Main = () => {
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
+            mb: 2,
           }}
         >
-          <TabList viewCompleted={viewCompleted} onToggle={toggleTab} />
+          <Tabs viewCompleted={viewCompleted} onToggle={toggleTab} />
           <SearchBar onSearch={handleSearch} />
           <Button variant="contained" startIcon={<Add />} onClick={createItem}>
             Add task
@@ -92,6 +105,7 @@ export const Main = () => {
           items={todoList.filter((t) => t.completed === viewCompleted)}
           onEdit={editItem}
           onDelete={deleteItem}
+          onSort={handleSort}
         />
       </Paper>
       {showItemDialog ? (

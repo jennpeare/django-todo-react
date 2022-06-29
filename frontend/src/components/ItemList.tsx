@@ -9,20 +9,23 @@ import {
   ListItemIcon,
   ListItemText,
 } from "@mui/material";
-import { TodoItem } from "../types";
+import { Sorter, TodoItem } from "../types";
 import { PriorityIcon } from "./PriorityIcon";
+import { SortingChips } from "./SortingChips";
 
 interface ItemListProps {
   onDelete: (item: TodoItem) => void;
   onEdit: (item: TodoItem) => void;
+  onSort: (sorters: Sorter[]) => void;
   items: TodoItem[];
 }
 
 export const ItemList = (props: ItemListProps) => {
-  const { items, onDelete, onEdit } = props;
+  const { items, onDelete, onEdit, onSort } = props;
 
   return (
-    <List sx={{ width: "100%" }}>
+    <List>
+      <SortingChips onSort={onSort} />
       {items.map((item, index) => (
         <Box key={item.id}>
           <ListItem
@@ -53,7 +56,11 @@ export const ItemList = (props: ItemListProps) => {
             <ListItemIcon>
               <PriorityIcon priority={item.priority} />
             </ListItemIcon>
-            <ListItemText primary={item.title} secondary={item.description} />
+            <ListItemText
+              primary={item.title}
+              secondary={item.description}
+              sx={{ textDecoration: item.completed ? "line-through" : "none" }}
+            />
           </ListItem>
           {index !== items.length - 1 ? <Divider component="li" /> : null}
         </Box>

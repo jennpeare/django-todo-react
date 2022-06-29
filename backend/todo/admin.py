@@ -7,6 +7,7 @@ from .models import Todo
 class TodoAdmin(admin.ModelAdmin):
     list_display = ("id", "title", "description", "completed", "priority", "due_date")
     search_fields = ["title", "description"]
+    sortable_by = ["title", "priority", "due_date"]
 
 
 # Register your models here
