@@ -4,6 +4,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { ItemDialog } from "./components/ItemDialog";
 import { ItemList } from "./components/ItemList";
+import { SearchBar } from "./components/SearchBar";
 import { TabList } from "./components/TabList";
 import { TodoItem } from "./types";
 
@@ -63,6 +64,11 @@ export const Main = () => {
     refreshList();
   };
 
+  const handleSearch = async (searchTerm: string) => {
+    const res = await axios.get(`/api/todos/?search=${searchTerm}`);
+    setTodoList(res.data);
+  };
+
   return (
     <Stack sx={{ alignItems: "center" }}>
       <Typography variant="h4" sx={{ my: 2 }}>
@@ -77,6 +83,7 @@ export const Main = () => {
           }}
         >
           <TabList viewCompleted={viewCompleted} onToggle={toggleTab} />
+          <SearchBar onSearch={handleSearch} />
           <Button variant="contained" startIcon={<Add />} onClick={createItem}>
             Add task
           </Button>
