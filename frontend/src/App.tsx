@@ -19,7 +19,10 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <LocalizationProvider dateAdapter={AdapterDateFns}>
-        <Container fixed>
+        <Container
+          disableGutters
+          sx={{ height: "100%", display: "flex", alignItems: "center" }}
+        >
           <Main />
         </Container>
       </LocalizationProvider>

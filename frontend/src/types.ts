@@ -7,6 +7,8 @@ export interface TodoItem {
   due_date: string | null;
 }
 
+export type TabState = "all" | "complete" | "incomplete";
+
 export type SortType = "due_date" | "priority" | "title";
 export type SortState = "asc" | "desc" | "off";
 export type Sorter = {

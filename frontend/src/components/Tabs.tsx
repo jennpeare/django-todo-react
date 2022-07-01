@@ -1,27 +1,26 @@
-import { Button, ButtonGroup } from "@mui/material";
+import { ToggleButton, ToggleButtonGroup } from "@mui/material";
+import { TabState } from "../types";
 
 interface TabListProps {
-  onToggle: (displayCompleted: boolean) => void;
-  viewCompleted: boolean;
+  activeTab: TabState;
+  onToggle: (tabState: TabState) => void;
 }
 
 export const Tabs = (props: TabListProps) => {
-  const { onToggle, viewCompleted } = props;
+  const { activeTab, onToggle } = props;
+
+  const handleChange = (
+    _: React.MouseEvent<HTMLElement>,
+    nextView: TabState
+  ) => {
+    onToggle(nextView);
+  };
 
   return (
-    <ButtonGroup variant="contained">
-      <Button
-        onClick={() => onToggle(true)}
-        variant={viewCompleted ? "contained" : "outlined"}
-      >
-        Completed
-      </Button>
-      <Button
-        onClick={() => onToggle(false)}
-        variant={viewCompleted ? "outlined" : "contained"}
-      >
-        Incomplete
-      </Button>
-    </ButtonGroup>
+    <ToggleButtonGroup exclusive onChange={handleChange} value={activeTab}>
+      <ToggleButton value="all">All</ToggleButton>
+      <ToggleButton value="complete">Complete</ToggleButton>
+      <ToggleButton value="incomplete">Incomplete</ToggleButton>
+    </ToggleButtonGroup>
   );
 };

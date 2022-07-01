@@ -1,4 +1,9 @@
-import { Delete, Edit, Schedule } from "@mui/icons-material";
+import {
+  Delete,
+  Edit,
+  Schedule,
+  SentimentDissatisfied,
+} from "@mui/icons-material";
 import {
   Box,
   Chip,
@@ -8,6 +13,10 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
+  Stack,
+  SxProps,
+  Theme,
+  Typography,
 } from "@mui/material";
 import { Sorter, TodoItem } from "../types";
 import { PriorityIcon } from "./PriorityIcon";
@@ -18,13 +27,23 @@ interface ItemListProps {
   onEdit: (item: TodoItem) => void;
   onSort: (sorters: Sorter[]) => void;
   items: TodoItem[];
+  sx?: SxProps<Theme>;
 }
 
 export const ItemList = (props: ItemListProps) => {
-  const { items, onDelete, onEdit, onSort } = props;
+  const { items, onDelete, onEdit, onSort, sx } = props;
+
+  if (items.length === 0) {
+    return (
+      <Stack alignItems="center" justifyContent="center" spacing={1} sx={sx}>
+        <SentimentDissatisfied fontSize="large" />
+        <Typography>No items to display.</Typography>
+      </Stack>
+    );
+  }
 
   return (
-    <List>
+    <List disablePadding sx={sx}>
       <SortingChips onSort={onSort} />
       {items.map((item, index) => (
         <Box key={item.id}>

@@ -1,12 +1,21 @@
 import { Add } from "@mui/icons-material";
-import { Box, Button, Paper, Stack, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Pagination,
+  Paper,
+  Stack,
+  Typography,
+} from "@mui/material";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { ItemDialog } from "./components/ItemDialog";
 import { ItemList } from "./components/ItemList";
 import { SearchBar } from "./components/SearchBar";
 import { Tabs } from "./components/Tabs";
-import { Sorter, TodoItem } from "./types";
+import { Sorter, TabState, TodoItem } from "./types";
+
+const ITEMS_PER_PAGE = 5;
 
 const getNewItem = (): TodoItem => ({
   title: "",
@@ -17,26 +26,35 @@ const getNewItem = (): TodoItem => ({
 });
 
 export const Main = () => {
-  const [viewCompleted, setViewCompleted] = useState(false);
+  const [activeTab, setActiveTab] = useState<TabState>("all");
   const [showItemDialog, setShowItemDialog] = useState(false);
   const [activeItem, setActiveItem] = useState<TodoItem>(getNewItem());
   const [todoList, setTodoList] = useState<TodoItem[]>([]);
+  const [meta, setMeta] = useState<{
+    count: number;
+    next: string | null;
+    previous: string | null;
+  }>({ count: 0, next: null, previous: null });
+  const [currentPage, setCurrentPage] = useState<number>(1);
 
-  useEffect(() => {
-    refreshList();
-  }, []);
-
-  const refreshList = async () => {
+  const refreshList = async (page?: number) => {
     try {
-      const res = await axios.get("/api/todos/");
-      setTodoList(res.data);
+      const res = await axios.get(`/api/todos/?page=${page ?? currentPage}`);
+      const { count, next, previous, results } = res.data;
+      setTodoList(results);
+      setMeta({ count, next, previous });
     } catch (error) {
       console.log(error);
     }
   };
 
-  const toggleTab = (displayCompleted: boolean) => {
-    setViewCompleted(displayCompleted);
+  useEffect(() => {
+    refreshList();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const toggleTab = (tabState: TabState) => {
+    setActiveTab(tabState);
   };
 
   const createItem = () => {
@@ -81,33 +99,54 @@ export const Main = () => {
     setTodoList(res.data);
   };
 
+  const handlePagination = (_: React.ChangeEvent<unknown>, page: number) => {
+    setCurrentPage(page);
+    refreshList(page);
+  };
+
   return (
-    <Stack sx={{ alignItems: "center" }}>
-      <Typography variant="h4" sx={{ my: 2 }}>
+    <Paper
+      component={Stack}
+      spacing={2}
+      sx={{ p: 2, width: "100%", minHeight: 600 }}
+    >
+      <Typography variant="h4" sx={{ alignSelf: "center" }}>
         TODO APP
       </Typography>
-      <Paper sx={{ p: 2, width: "100%" }}>
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            mb: 2,
-          }}
-        >
-          <Tabs viewCompleted={viewCompleted} onToggle={toggleTab} />
-          <SearchBar onSearch={handleSearch} />
-          <Button variant="contained" startIcon={<Add />} onClick={createItem}>
-            Add task
-          </Button>
-        </Box>
-        <ItemList
-          items={todoList.filter((t) => t.completed === viewCompleted)}
-          onEdit={editItem}
-          onDelete={deleteItem}
-          onSort={handleSort}
+
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <Tabs activeTab={activeTab} onToggle={toggleTab} />
+        <SearchBar onSearch={handleSearch} />
+        <Button variant="contained" startIcon={<Add />} onClick={createItem}>
+          Add task
+        </Button>
+      </Box>
+
+      <ItemList
+        items={
+          activeTab === "all"
+            ? todoList
+            : todoList.filter((t) => t.completed !== (activeTab === "complete"))
+        }
+        onEdit={editItem}
+        onDelete={deleteItem}
+        onSort={handleSort}
+        sx={{ flex: "1 0 auto" }}
+      />
+
+      {meta.count !== 0 ? (
+        <Pagination
+          count={Math.ceil(meta.count / ITEMS_PER_PAGE)}
+          onChange={handlePagination}
+          sx={{ alignSelf: "center" }}
         />
-      </Paper>
+      ) : null}
       {showItemDialog ? (
         <ItemDialog
           activeItem={activeItem}
@@ -115,6 +154,6 @@ export const Main = () => {
           onSave={saveItem}
         />
       ) : null}
-    </Stack>
+    </Paper>
   );
 };
