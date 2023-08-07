@@ -8,7 +8,7 @@ import {
   Typography,
 } from "@mui/material";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ItemDialog } from "./components/ItemDialog";
 import { ItemList } from "./components/ItemList";
 import { SearchBar } from "./components/SearchBar";
@@ -37,21 +37,23 @@ export const Main = () => {
   }>({ count: 0, next: null, previous: null });
   const [currentPage, setCurrentPage] = useState<number>(1);
 
-  const refreshList = async (page?: number) => {
-    try {
-      const res = await axios.get(`/api/todos/?page=${page ?? currentPage}`);
-      const { count, next, previous, results } = res.data;
-      setTodoList(results);
-      setMeta({ count, next, previous });
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  const refreshList = useCallback(
+    async (page?: number) => {
+      try {
+        const res = await axios.get(`/api/todos/?page=${page ?? currentPage}`);
+        const { count, next, previous, results } = res.data;
+        setTodoList(results);
+        setMeta({ count, next, previous });
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    [currentPage]
+  );
 
   useEffect(() => {
     refreshList();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [refreshList]);
 
   const toggleTab = (tabState: TabState) => {
     setActiveTab(tabState);
@@ -84,7 +86,7 @@ export const Main = () => {
 
   const handleSearch = async (searchTerm: string) => {
     const res = await axios.get(`/api/todos/?search=${searchTerm}`);
-    setTodoList(res.data);
+    setTodoList(res.data.results);
   };
 
   const handleSort = async (sorters: Sorter[]) => {
@@ -96,7 +98,7 @@ export const Main = () => {
       .filter((q) => q !== "")
       .join(",");
     const res = await axios.get(`/api/todos/?ordering=${query}`);
-    setTodoList(res.data);
+    setTodoList(res.data.results);
   };
 
   const handlePagination = (_: React.ChangeEvent<unknown>, page: number) => {
